@@ -19,7 +19,7 @@ using namespace std;
 void fillAry(char[],short[]);
 void output(char[]);
 void guessIn(char[],short[]);
-void compare(char[],char[],short[],short[]);
+bool compare(char[],char[],short[],short[]);
 bool Restart();
 //Program Execution Begins Here
 
@@ -27,23 +27,27 @@ bool Restart();
 short SIZE = 4;
 int main() {
     //Declare and process variables
-    bool restart;
+    bool cont(true),
+         restart;
     char master[SIZE],
             guess[SIZE];
     srand(static_cast<int>(time(0)));
     //Process/Calculations Here
+    
     do {
-    
         short tracker[10]={0},
-              track2[10]={0};
+              track2[10]={0},
+              numG=0;
         
-    
         fillAry(master,tracker);
+        do{
         guessIn(guess,track2);
         //output(master);
-        compare(master,guess,tracker,track2);
-
-
+        cont=compare(master,guess,tracker,track2);
+        numG++;
+        }while(cont);
+        cout<<"Congratulations! You are the mastermind!\n"
+                "Number of guesses: "<<numG<<endl;
         restart = Restart();
     } while (restart);
 
@@ -52,7 +56,6 @@ int main() {
     //Exit
     return 0;
 }
-
 void fillAry(char m[],short t[]){
     for(short i=0;i<SIZE;i++){
         m[i]=rand()%10+48;
@@ -73,44 +76,46 @@ void output(char m[]){
 }
 void guessIn(char g[],short t2[]){
     string guess;
+    for(short i=0;i<10;i++){
+        t2[i]=0;            //guess tracker re-initialization
+    }
     cout<<"Input your guess."<<endl;
     cin>>guess;
     for(short i=0;i<SIZE;i++){
         g[i]=guess.at(i);
         t2[g[i]-48]++;
-        cout<<g[i]<<endl;
+//        cout<<g[i]<<endl;
     }
 }
-void compare(char m[],char g[],short t[],short t2[]){
-    short nc;
+bool compare(char m[],char g[],short t[],short t2[]){
+    bool cont=false;
+    short nc,           //correctly guessed numbers
+          pc;           //correctly guessed positions
+    nc=pc=0;            //initialization
+
     for(short i=0;i<10;i++){
         if(t2[i]>=1&&t[i]>=1){
-        cout<<"t2["<<i<<"]: "<<t2[i]<<"   ";
-        cout<<"t["<<i<<"]: "<<t[i]<<endl;
-            while(t2[i]>=1&&t[i]>=1){
-                t2[i]--;t[i]--;nc++;
+//        cout<<"t2["<<i<<"]: "<<t2[i]<<"   ";
+//        cout<<"t["<<i<<"]: "<<t[i]<<endl;
+        short c1=t[i],c2=t2[i];
+            while(c1>=1&&c2>=1){
+                c1--;c2--;nc++;
             }
         }
     }
-    cout<<"Number correct: "<<nc<<endl;
-    short num[SIZE],
-          pos[SIZE],
-            equal=0;
     for(short i=0;i<SIZE;i++){
-              pos[i]=0,
-              num[i]=0;
         if(g[i]==m[i]){
-            pos[i]=1;num[i]=1;
-            }
-    }
-        for(short i=0;i<SIZE;i++){              //equal numbers finder
-            if(g[i]==g[SIZE-i]){
-                equal++;
-            }
+            pc++;
         }
-        
+    }
+    if(pc==4&&nc==4){cont=false;}
+    else {
+          cont=true;
+          cout<<"Number correct: "<<nc<<endl;
+          cout<<"Positions correct: "<<pc<<endl;
+    }
+    return cont;
                 }
-
 bool Restart() {
     char ans;
     bool restart;
