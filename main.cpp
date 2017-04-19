@@ -8,7 +8,6 @@
 //System Libraries Here
 #include <iostream>
 #include <cstdlib>
-#include <cstring>
 #include <iomanip>
 using namespace std;
 
@@ -27,7 +26,7 @@ bool Restart();
 short SIZE = 4;
 int main() {
     //Declare and process variables
-    bool cont(true),
+    bool cont,
          restart;
     char master[SIZE],
             guess[SIZE];
@@ -37,17 +36,27 @@ int main() {
     do {
         short tracker[10]={0},
               track2[10]={0},
-              numG=0;
+              numG=10;
         
         fillAry(master,tracker);
         do{
+        cont=true;              //initialize boolean for continuation
         guessIn(guess,track2);
-        //output(master);
-        cont=compare(master,guess,tracker,track2);
-        numG++;
-        }while(cont);
-        cout<<"Congratulations! You are the mastermind!\n"
-                "Number of guesses: "<<numG<<endl;
+        //output(master);           
+        cont=compare(master,guess,tracker,track2);      
+        numG--;
+        cout<<"Guesses remaining: "<<numG<<endl;
+        }while(cont&&numG>0);
+        if(cont==false){
+          cout<<"Congratulations! You are the mastermind!\n"
+                "Number of guesses: "<<10-numG<<endl;
+        }else{cout<<"You were outsmarted!\n"
+                "Correct answer: ";
+        for (short i=0;i<SIZE;i++){
+            cout<<master[i];
+        }
+        cout<<endl;
+        }
         restart = Restart();
     } while (restart);
 
@@ -62,7 +71,7 @@ void fillAry(char m[],short t[]){
         t[m[i]-48]++;
     }
     cout<<"The numbers are set!"<<endl;
-    cout<<"TEST:: ";
+    //cout<<"TEST:: ";
     for(short i=0;i<SIZE;i++){
         cout<<m[i];
     }
@@ -75,14 +84,16 @@ void output(char m[]){
     cout<<endl;
 }
 void guessIn(char g[],short t2[]){
-    string guess;
     for(short i=0;i<10;i++){
         t2[i]=0;            //guess tracker re-initialization
     }
     cout<<"Input your guess."<<endl;
-    cin>>guess;
     for(short i=0;i<SIZE;i++){
-        g[i]=guess.at(i);
+        cin>>g[i];
+        while(g[i]<48||g[i]>58){
+            cout<<"Invalid Input. Try again."<<endl;
+            cin>>g[i];
+        }
         t2[g[i]-48]++;
 //        cout<<g[i]<<endl;
     }
@@ -111,7 +122,7 @@ bool compare(char m[],char g[],short t[],short t2[]){
     if(pc==4&&nc==4){cont=false;}
     else {
           cont=true;
-          cout<<"Number correct: "<<nc<<endl;
+          cout<<"Numbers correct: "<<nc<<endl;
           cout<<"Positions correct: "<<pc<<endl;
     }
     return cont;
